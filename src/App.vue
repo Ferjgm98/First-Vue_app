@@ -1,28 +1,50 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app" class="bg-blue-light h-screen overflow-y-hidden">
+    <h1 class="font-sans text-grey-darkest text-5xl font-bold text-center pt-10">Robofriends</h1>
+    <SearchBox v-on:inputChange="filterRobots"/>
+    <Scroll>
+      <CardList v-bind:robots="store.filteredRobots ? store.filteredRobots : robots"/>
+    </Scroll>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SearchBox from "./components/SearchBox";
+import CardList from "./components/CardList";
+import Scroll from "./components/Scroll";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
-    HelloWorld
+    SearchBox,
+    CardList,
+    Scroll
+  },
+  data() {
+    return {
+      robots: "",
+      store: {
+        filteredRobots: null
+      }
+    };
+  },
+  methods: {
+    filterRobots(val) {
+      this.store.filteredRobots = this.robots.filter(robot =>
+        robot.name.toLowerCase().includes(val.toLowerCase())
+      );
+    }
+  },
+  created() {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then(resp => resp.json())
+      .then(data => (this.robots = data))
+      .catch(error => {
+        throw error;
+      });
   }
-}
+};
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
